@@ -15,13 +15,13 @@ window.wedding = {
   },
   partners: [
     {
-      name: 'Linh',
+      name: 'Ty',
       role: 'The bride',
       photo: 'assets/bride.jpg',
       bio: 'Happiest with flowers on the table, a camera in hand, and friends around the room.',
     },
     {
-      name: 'Minh',
+      name: 'Cường',
       role: 'The groom',
       photo: 'assets/groom.jpg',
       bio: 'Always looking for a good cup of coffee and a quiet road into the hills.',
