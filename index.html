@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f4ec">
+  <meta name="description" content="A wedding invitation with event details, our story, and a pre-wedding album.">
+  <title>Linh &amp; Minh · Wedding Invitation</title>
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="wedding.js"></script>
+  <script defer src="script.js"></script>
+</head>
+<body id="top">
+  <a class="skip-link" href="#invitation">Skip to invitation</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="monogram" href="#top" id="monogram" aria-label="Back to top">L <i>&amp;</i> M</a>
+      <nav aria-label="Invitation">
+        <a href="#story">Our Story</a>
+        <a href="#details">The Day</a>
+        <a href="#album">Album</a>
+      </nav>
+      <button class="sound-toggle" id="sound-toggle" type="button" aria-pressed="false" hidden><span aria-hidden="true">♫</span> <span id="sound-label">Music off</span></button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow">Together with our families</p>
+        <h1 id="hero-title"><span data-partner="0">Linh</span><i>&amp;</i><span data-partner="1">Minh</span></h1>
+        <span class="ornament" aria-hidden="true">✦</span>
+        <p class="hero-date" id="hero-date"></p>
+        <p class="hero-location" id="hero-location"></p>
+        <a class="button button-dark" href="#invitation">Open invitation <span aria-hidden="true">↓</span></a>
+      </div>
+      <figure class="hero-photo">
+        <img id="hero-image" src="assets/garden-walk.jpg" alt="A bride and groom walking through a garden" width="1440" height="960" fetchpriority="high">
+        <figcaption id="hero-caption"></figcaption>
+      </figure>
+    </section>
+
+    <section class="countdown" id="invitation" aria-labelledby="countdown-title">
+      <div class="countdown-inner">
+        <div class="countdown-copy">
+          <p class="eyebrow" id="countdown-kicker">Save the date</p>
+          <h2 id="countdown-title">Counting down</h2>
+        </div>
+        <dl class="countdown-grid" id="countdown-grid">
+          <div><dt>Days</dt><dd id="days">00</dd></div>
+          <div><dt>Hours</dt><dd id="hours">00</dd></div>
+          <div><dt>Minutes</dt><dd id="minutes">00</dd></div>
+          <div><dt>Seconds</dt><dd id="seconds">00</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="section couple-section" aria-labelledby="couple-title">
+      <div class="section-heading">
+        <p class="eyebrow">Meet the couple</p>
+        <h2 id="couple-title">The bride <i>&amp;</i> groom</h2>
+      </div>
+      <div class="couple-grid" id="couple"></div>
+    </section>
+
+    <section class="section details-section" id="details" aria-labelledby="details-title">
+      <div class="section-heading">
+        <p class="eyebrow">When &amp; where</p>
+        <h2 id="details-title">Celebrate with us</h2>
+        <p id="details-intro"></p>
+      </div>
+      <div class="event-grid" id="events"></div>
+      <div class="schedule">
+        <h3>Order of the day</h3>
+        <ol id="schedule"></ol>
+      </div>
+    </section>
+
+    <section class="section story-section" id="story" aria-labelledby="story-title">
+      <figure class="story-photo">
+        <img id="story-image" loading="lazy" decoding="async" alt="">
+      </figure>
+      <div class="story-content">
+        <p class="eyebrow">How it all started</p>
+        <h2 id="story-title">Our love story</h2>
+        <ol class="story-list" id="milestones"></ol>
+      </div>
+    </section>
+
+    <section class="section album-section" id="album" aria-labelledby="album-title">
+      <div class="section-heading">
+        <p class="eyebrow">In photographs</p>
+        <h2 id="album-title">Our album</h2>
+      </div>
+      <div class="album-controls" id="album-controls" role="group" aria-label="Choose an album"></div>
+      <div class="album-grid" id="album-grid" aria-label="Album photos"></div>
+    </section>
+
+    <section class="section film-section" id="film" aria-labelledby="film-title" hidden>
+      <div class="section-heading"><h2 id="film-title">Our wedding films</h2></div>
+      <div class="film-grid" id="films"></div>
+    </section>
+
+    <section class="closing" id="wedding-invitation" aria-labelledby="closing-title">
+      <span class="ornament" aria-hidden="true">✦</span>
+      <p class="eyebrow">With love</p>
+      <h2 id="closing-title"><span data-partner="0">Linh</span> <i>&amp;</i> <span data-partner="1">Minh</span></h2>
+      <p id="closing-message"></p>
+      <div class="actions">
+        <a class="button button-light" href="#details">View event details <span aria-hidden="true">↑</span></a>
+        <button class="button button-outline" id="gift-open" type="button" hidden>Send a gift <span aria-hidden="true">↗</span></button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p id="footer-note"></p>
+    <a href="#top">Back to top <span aria-hidden="true">↑</span></a>
+  </footer>
+
+  <audio id="background-music" loop preload="none"></audio>
+
+  <dialog class="lightbox" id="lightbox" aria-label="Photo viewer">
+    <form method="dialog"><button class="dialog-close" type="submit" aria-label="Close photo viewer" autofocus>×</button></form>
+    <figure><img id="lightbox-image" alt=""><figcaption id="lightbox-caption"></figcaption></figure>
+    <div class="lightbox-controls">
+      <button id="photo-previous" type="button" aria-label="Previous photo">←</button>
+      <span id="photo-position" aria-live="polite"></span>
+      <button id="photo-next" type="button" aria-label="Next photo">→</button>
+    </div>
+  </dialog>
+
+  <dialog class="gift-dialog" id="gift-dialog" aria-labelledby="gift-title">
+    <form method="dialog"><button class="dialog-close" type="submit" aria-label="Close gift card" autofocus>×</button></form>
+    <h2 id="gift-title">Wedding gifts</h2>
+    <p id="gift-message"></p>
+    <div id="gift-options"></div>
+  </dialog>
+
+  <noscript><p class="noscript">Please enable JavaScript to see the event details, countdown, and album.</p></noscript>
+</body>
+</html>
