@@ -42,11 +42,9 @@ document.querySelectorAll('[data-partner]').forEach((node) => {
 byId('hero-date').textContent = formatDate.format(new Date(wedding.events[0].start));
 byId('hero-location').textContent = wedding.location;
 byId('hero-caption').textContent = wedding.hero.caption;
-for (const [id, image] of [['hero-image', wedding.hero], ['story-image', wedding.storyPhoto]]) {
-  const target = byId(id);
-  if (target.getAttribute('src') !== image.src) target.src = image.src;
-  target.alt = image.alt;
-}
+const heroImage = byId('hero-image');
+if (heroImage.getAttribute('src') !== wedding.hero.src) heroImage.src = wedding.hero.src;
+heroImage.alt = wedding.hero.alt;
 byId('details-intro').textContent = wedding.detailsIntro;
 byId('closing-message').textContent = wedding.closing;
 byId('footer-note').textContent = wedding.demo ? 'Sample wedding invitation' : `${names} · ${wedding.location}`;
@@ -142,20 +140,11 @@ for (const item of wedding.schedule) {
   byId('schedule').append(row);
 }
 
-for (const milestone of wedding.milestones) {
-  const row = element('li');
-  const story = element('div');
-  story.append(element('h3', milestone.title), element('p', milestone.text));
-  row.append(element('span', milestone.year, 'year'), story);
-  byId('milestones').append(row);
-}
-
 const lightbox = byId('lightbox');
 const lightboxImage = byId('lightbox-image');
 const previousPhoto = byId('photo-previous');
 const nextPhoto = byId('photo-next');
-const albumGrid = byId('album-grid');
-const albumControls = byId('album-controls');
+const albumChapters = byId('album-chapters');
 let activePhotos = [];
 let photoIndex = 0;
 
@@ -170,10 +159,12 @@ function showPhoto(index) {
   nextPhoto.hidden = activePhotos.length < 2;
 }
 
-function showAlbum(index) {
-  activePhotos = wedding.albums[index].photos;
-  [...albumControls.children].forEach((button, position) => button.setAttribute('aria-pressed', String(position === index)));
-  albumGrid.replaceChildren(...activePhotos.map((item, position) => {
+for (const album of wedding.albums) {
+  if (!album.photos.length) continue;
+  const chapter = element('section', '', 'album-chapter');
+  const grid = element('div', '', 'album-grid');
+  album.photos.forEach((item, position) => {
+    const figure = element('figure', '', 'album-photo');
     const button = element('button', '', 'photo-button');
     button.type = 'button';
     button.setAttribute('aria-label', `Enlarge ${item.caption || item.alt}`);
@@ -181,27 +172,67 @@ function showAlbum(index) {
     icon.setAttribute('aria-hidden', 'true');
     button.append(photo(item.src, item.alt), icon);
     button.addEventListener('click', () => {
+      activePhotos = album.photos;
       showPhoto(position);
       lightbox.showModal();
     });
-    return button;
-  }));
+    figure.append(button);
+    if (item.caption) figure.append(element('figcaption', item.caption));
+    grid.append(figure);
+  });
+  chapter.append(element('h3', album.name), grid);
+  albumChapters.append(chapter);
 }
 
-for (const [index, album] of wedding.albums.entries()) {
-  const button = element('button', album.name);
-  button.type = 'button';
-  button.setAttribute('aria-controls', 'album-grid');
-  button.addEventListener('click', () => showAlbum(index));
-  albumControls.append(button);
-}
-
-if (wedding.albums.length) {
-  showAlbum(0);
-  albumControls.hidden = wedding.albums.length < 2;
-} else {
+if (!albumChapters.childElementCount) {
   byId('album').hidden = true;
   document.querySelector('nav a[href="#album"]').hidden = true;
+}
+
+const header = document.querySelector('.site-header');
+const navigationSections = [...header.querySelectorAll('nav a:not([hidden])')].map((link) => ({
+  link,
+  section: byId(link.hash.slice(1)),
+}));
+let currentSectionLink = navigationSections[0].link;
+
+function updateCurrentSection() {
+  const marker = header.getBoundingClientRect().bottom + 18;
+  let current = navigationSections[0].link;
+  for (const { link, section } of navigationSections) {
+    if (section.getBoundingClientRect().top > marker) break;
+    current = link;
+  }
+  if (current === currentSectionLink) return;
+  currentSectionLink.removeAttribute('aria-current');
+  current.setAttribute('aria-current', 'location');
+  currentSectionLink = current;
+}
+
+window.addEventListener('scroll', updateCurrentSection, { passive: true });
+window.addEventListener('resize', updateCurrentSection);
+window.addEventListener('pageshow', updateCurrentSection);
+updateCurrentSection();
+
+if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const observer = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      const item = entry.target;
+      if (!entry.isIntersecting) {
+        item.classList.toggle('reveal-from-above', entry.boundingClientRect.bottom <= 0);
+      }
+      item.classList.toggle('is-revealed', entry.isIntersecting);
+    }
+  });
+
+  const items = document.querySelectorAll([
+    '.countdown-copy', '.countdown-grid div', '.section-heading', '.couple-card',
+    '.event-card', '.schedule h3', '.schedule li', '.album-chapter h3', '.album-photo', '.closing > *',
+  ].join(', '));
+  for (const item of items) {
+    item.classList.add('scroll-reveal');
+    observer.observe(item);
+  }
 }
 
 previousPhoto.addEventListener('click', () => showPhoto(photoIndex - 1));
@@ -214,30 +245,66 @@ lightbox.addEventListener('keydown', (event) => {
 });
 
 const music = byId('background-music');
-const soundToggle = byId('sound-toggle');
 
-function updateSoundButton() {
-  soundToggle.setAttribute('aria-pressed', String(!music.paused));
-  byId('sound-label').textContent = music.paused ? 'Music off' : 'Music on';
-}
+function setupMusic(tracks) {
+  if (!tracks.length) return;
+  const toggle = byId('sound-toggle');
+  let trackIndex = 0;
+  let playRequest = 0;
+  let failedTracks = 0;
+  let waitingForClick = false;
 
-if (wedding.music) {
-  music.src = wedding.music;
-  soundToggle.hidden = false;
+  function updateSoundButton() {
+    const playing = !music.paused && !music.ended;
+    toggle.setAttribute('aria-pressed', String(playing));
+    toggle.title = playing ? 'Turn music off' : 'Turn music on';
+  }
+
+  function playNextTrack() {
+    trackIndex = (trackIndex + 1) % tracks.length;
+    music.src = tracks[trackIndex];
+    playMusic();
+  }
+
+  async function playMusic() {
+    const request = ++playRequest;
+    waitingForClick = false;
+    try {
+      await music.play();
+      if (request === playRequest) failedTracks = 0;
+    } catch (error) {
+      if (request !== playRequest || error.name === 'AbortError') return;
+      if (error.name === 'NotAllowedError') {
+        waitingForClick = true;
+      } else if (++failedTracks < tracks.length) {
+        playNextTrack();
+      }
+      updateSoundButton();
+    }
+  }
+
+  toggle.hidden = false;
+  music.src = tracks[trackIndex];
   music.addEventListener('play', updateSoundButton);
   music.addEventListener('pause', updateSoundButton);
-  soundToggle.addEventListener('click', async () => {
-    if (music.paused) {
-      try {
-        await music.play();
-      } catch (error) {
-        if (error.name !== 'AbortError') byId('sound-label').textContent = 'Music unavailable';
-      }
-    } else {
+  music.addEventListener('ended', playNextTrack);
+  toggle.addEventListener('click', () => {
+    if (!music.paused && !music.ended) {
+      playRequest++;
       music.pause();
+      return;
     }
+    failedTracks = 0;
+    if (music.error) music.src = tracks[trackIndex];
+    playMusic();
   });
+  document.addEventListener('click', (event) => {
+    if (waitingForClick && !toggle.contains(event.target)) playMusic();
+  });
+  playMusic();
 }
+
+setupMusic(window.weddingPlaylist || []);
 
 for (const film of wedding.films) {
   const card = element('article');
@@ -263,16 +330,18 @@ for (const film of wedding.films) {
 byId('film').hidden = wedding.films.length === 0;
 
 const giftDialog = byId('gift-dialog');
-const giftOpen = byId('gift-open');
 if (wedding.gifts) {
   byId('gift-message').textContent = wedding.gifts.message;
+  byId('gift-note').hidden = !wedding.gifts.sample;
   for (const option of wedding.gifts.options) {
-    const item = element('div');
+    const item = element('article', '', 'gift-option');
     item.append(element('h3', option.title));
-    if (option.qrImage) item.append(photo(option.qrImage, `Gift QR code for ${option.title}`));
+    if (option.qrImage) item.append(photo(option.qrImage, `Gift QR code (${option.title})`));
     if (option.url) item.append(link('Open gift link ↗', option.url));
     byId('gift-options').append(item);
   }
-  giftOpen.hidden = false;
-  giftOpen.addEventListener('click', () => giftDialog.showModal());
+  for (const button of [byId('gift-nav'), byId('gift-open')]) {
+    button.hidden = false;
+    button.addEventListener('click', () => giftDialog.showModal());
+  }
 }

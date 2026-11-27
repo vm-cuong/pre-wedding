@@ -3,11 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f7f4ec">
-  <meta name="description" content="A wedding invitation with event details, our story, and a pre-wedding album.">
-  <title>Ty &amp; Cường · Wedding Invitation</title>
+  <meta name="theme-color" content="#72142d">
+  <meta name="description" content="A wedding invitation with event details and photos.">
+  <title>Linh &amp; Minh · Wedding Invitation</title>
   <link rel="stylesheet" href="styles.css">
   <script defer src="wedding.js"></script>
+  <script defer src="playlist.js"></script>
   <script defer src="script.js"></script>
 </head>
 <body id="top">
@@ -16,11 +17,12 @@
     <div class="header-inner">
       <a class="monogram" href="#top" id="monogram" aria-label="Back to top">L <i>&amp;</i> M</a>
       <nav aria-label="Invitation">
-        <a href="#story">Our Story</a>
-        <a href="#details">The Day</a>
-        <a href="#album">Album</a>
+        <a href="#top" aria-current="location">Home</a>
+        <a href="#about">About Us</a>
+        <a href="#details">Wedding Information</a>
+        <a href="#album">Photos</a>
+        <button class="nav-gift" id="gift-nav" type="button" aria-haspopup="dialog" aria-controls="gift-dialog" hidden>Give Gift</button>
       </nav>
-      <button class="sound-toggle" id="sound-toggle" type="button" aria-pressed="false" hidden><span aria-hidden="true">♫</span> <span id="sound-label">Music off</span></button>
     </div>
   </header>
 
@@ -28,14 +30,14 @@
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-copy">
         <p class="eyebrow">Together with our families</p>
-        <h1 id="hero-title"><span data-partner="0">Ty</span><i>&amp;</i><span data-partner="1">Cường</span></h1>
+        <h1 id="hero-title"><span data-partner="0">Linh</span><i>&amp;</i><span data-partner="1">Minh</span></h1>
         <span class="ornament" aria-hidden="true">✦</span>
         <p class="hero-date" id="hero-date"></p>
         <p class="hero-location" id="hero-location"></p>
         <a class="button button-dark" href="#invitation">Open invitation <span aria-hidden="true">↓</span></a>
       </div>
       <figure class="hero-photo">
-        <img id="hero-image" src="assets/garden-walk.jpg" alt="A bride and groom walking through a garden" width="1440" height="960" fetchpriority="high">
+        <img id="hero-image" src="assets/rose-pavilion.jpg" alt="A bride and groom holding hands beneath a garden pavilion" width="1440" height="960" fetchpriority="high">
         <figcaption id="hero-caption"></figcaption>
       </figure>
     </section>
@@ -55,7 +57,7 @@
       </div>
     </section>
 
-    <section class="section couple-section" aria-labelledby="couple-title">
+    <section class="section couple-section" id="about" aria-labelledby="couple-title">
       <div class="section-heading">
         <p class="eyebrow">Meet the couple</p>
         <h2 id="couple-title">The bride <i>&amp;</i> groom</h2>
@@ -76,24 +78,11 @@
       </div>
     </section>
 
-    <section class="section story-section" id="story" aria-labelledby="story-title">
-      <figure class="story-photo">
-        <img id="story-image" loading="lazy" decoding="async" alt="">
-      </figure>
-      <div class="story-content">
-        <p class="eyebrow">How it all started</p>
-        <h2 id="story-title">Our love story</h2>
-        <ol class="story-list" id="milestones"></ol>
-      </div>
-    </section>
-
     <section class="section album-section" id="album" aria-labelledby="album-title">
-      <div class="section-heading">
-        <p class="eyebrow">In photographs</p>
-        <h2 id="album-title">Our album</h2>
+      <div class="section-heading" id="story">
+        <h2 id="album-title">In photographs</h2>
       </div>
-      <div class="album-controls" id="album-controls" role="group" aria-label="Choose an album"></div>
-      <div class="album-grid" id="album-grid" aria-label="Album photos"></div>
+      <div class="album-chapters" id="album-chapters"></div>
     </section>
 
     <section class="section film-section" id="film" aria-labelledby="film-title" hidden>
@@ -108,7 +97,7 @@
       <p id="closing-message"></p>
       <div class="actions">
         <a class="button button-light" href="#details">View event details <span aria-hidden="true">↑</span></a>
-        <button class="button button-outline" id="gift-open" type="button" hidden>Send a gift <span aria-hidden="true">↗</span></button>
+        <button class="button button-outline" id="gift-open" type="button" aria-haspopup="dialog" aria-controls="gift-dialog" hidden>Send a gift <span aria-hidden="true">↗</span></button>
       </div>
     </section>
   </main>
@@ -118,7 +107,10 @@
     <a href="#top">Back to top <span aria-hidden="true">↑</span></a>
   </footer>
 
-  <audio id="background-music" loop preload="none"></audio>
+  <button class="sound-toggle" id="sound-toggle" type="button" aria-label="Background music" aria-pressed="false" title="Turn music on" hidden>
+    <span class="speaker-icon" aria-hidden="true"></span>
+  </button>
+  <audio id="background-music" preload="none"></audio>
 
   <dialog class="lightbox" id="lightbox" aria-label="Photo viewer">
     <form method="dialog"><button class="dialog-close" type="submit" aria-label="Close photo viewer" autofocus>×</button></form>
@@ -134,6 +126,7 @@
     <form method="dialog"><button class="dialog-close" type="submit" aria-label="Close gift card" autofocus>×</button></form>
     <h2 id="gift-title">Wedding gifts</h2>
     <p id="gift-message"></p>
+    <p class="gift-note" id="gift-note" hidden>Sample QR codes for preview only.</p>
     <div id="gift-options"></div>
   </dialog>
 
