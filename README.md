@@ -4,7 +4,7 @@ A lightweight wedding invitation built with HTML, CSS, and browser JavaScript. R
 
 ## Reference and plan
 
-The [reference invitation](https://tynab.github.io/Yami-Buzzy/) opens with a welcome and optional music, then takes guests through the couple’s profiles, countdown, two venues, schedule, story, albums, films, and gifts. This version uses a split cover and garden photography with the same guest journey. It adds downloadable calendar entries for both events and a photo viewer that supports arrow keys and Escape.
+The [reference invitation](https://htmlcodex.com/10-best-free-wedding-website-templates-2026/)) opens with a welcome and optional music, then takes guests through the couple’s profiles, countdown, two venues, schedule, story, albums, films, and gifts. This version uses a split cover and garden photography with the same guest journey. It adds downloadable calendar entries for both events and a photo viewer that supports arrow keys and Escape.
 
 The sample invitation is ready to preview. Replace the sample content and media, check the guest links and calendar times, and publish the static files on GitHub Pages. The site switches from a countdown to a time-since counter on the day of the first event.
 
