@@ -230,8 +230,8 @@ if (wedding.music) {
     if (music.paused) {
       try {
         await music.play();
-      } catch {
-        byId('sound-label').textContent = 'Music unavailable';
+      } catch (error) {
+        if (error.name !== 'AbortError') byId('sound-label').textContent = 'Music unavailable';
       }
     } else {
       music.pause();
